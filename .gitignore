@@ -1,0 +1,7 @@
+# Cmake build dir
+build
+
+# Object files
+**/*.o
+
+**/*.log
