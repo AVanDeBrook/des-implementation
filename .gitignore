@@ -4,4 +4,8 @@ build
 # Object files
 **/*.o
 
+# Log files
 **/*.log
+
+# VS Code user workspace
+.vscode
