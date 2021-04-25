@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include "main.h"
+#include "gendefs.h"
 #include "des_encrypt.h"
 #include "key_schedule.h"
 #include "utils.h"

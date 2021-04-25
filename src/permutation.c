@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -27,7 +26,7 @@ int do_permutation(permutation_t permutation, uint64_t *data)
 {
 	int i, j, status_code = 0;
 	const uint32_t *permutation_table;
-	uint64_t output_data;
+	uint64_t output_data = 0;
 	int input_data_bits[DES_DATA_LENGTH_BITS], output_data_bits[DES_DATA_LENGTH_BITS];
 
 	memset(input_data_bits, 0, sizeof(int) * DES_DATA_LENGTH_BITS);

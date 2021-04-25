@@ -1,6 +1,5 @@
-#include <stdio.h>
-#include <inttypes.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "key_schedule.h"
 #include "gendefs.h"
@@ -127,7 +126,7 @@ static void drop_parity_bits(uint64_t *key)
 	int key_bit_array[DES_KEY_LENGTH_BITS];
 	uint64_t output_key = 0;
 
-	memset(key_bit_array, 0, sizeof(int));
+	memset(key_bit_array, 0, sizeof(int) * DES_KEY_LENGTH_BITS);
 
 	int2binarray(key_bit_array, *key, DES_KEY_LENGTH_BITS);
 
@@ -151,8 +150,8 @@ static void permute_key(uint64_t *key)
 	int key_bit_array[DES_KEY_LENGTH_BITS], output_key_array[DES_KEY_EFFECTIVE_LENGTH_BITS];
 	uint64_t permuted_key = 0;
 
-	memset(key_bit_array, 0, DES_KEY_LENGTH_BITS);
-	memset(output_key_array, 0, DES_KEY_EFFECTIVE_LENGTH_BITS);
+	memset(key_bit_array, 0, sizeof(int) * DES_KEY_LENGTH_BITS);
+	memset(output_key_array, 0, sizeof(int) * DES_KEY_EFFECTIVE_LENGTH_BITS);
 
 	int2binarray(key_bit_array, *key, DES_KEY_EFFECTIVE_LENGTH_BITS);
 

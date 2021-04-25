@@ -12,13 +12,9 @@
  * @param data Data input by user to encrypt
  * @return int Status of function execution. Value of 0 indicates no errors.
  */
-int encrypt(uint64_t key, uint64_t data)
+void encrypt(uint64_t key, uint64_t data)
 {
-	// perform initial permutation
 	do_permutation(PERMUTATION_INITIAL, &data);
-	// 16 feistel cipher rounds
 	do_feistel_cipher(key, &data);
-	// perform final permutation
 	do_permutation(PERMUTATION_FINAL, &data);
-	return 0;
 }

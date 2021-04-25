@@ -1,7 +1,6 @@
 #ifndef __MAIN_H
 #define __MAIN_H
 
-#include "gendefs.h"
 #include <stdint.h>
 
 /* Type, structure, enumerator definitions */
