@@ -14,12 +14,22 @@ static const int key_permutation_table[DES_KEY_LENGTH_BITS] = {
 static void drop_parity_bits(uint64_t *key);
 static void permute_key(uint64_t *key);
 
+/**
+ * @brief Processes the key (removes parity bits and permutes the key). @see key_permutation_table, drop_parity_bits, permute_key
+ *
+ * @param key Pointer to the user provided key.
+ */
 void process_key(uint64_t *key)
 {
 	drop_parity_bits(key);
 	permute_key(key);
 }
 
+/**
+ * @brief Drops the parity bits (LSB of each byte).
+ *
+ * @param key Pointer to the key.
+ */
 static void drop_parity_bits(uint64_t *key)
 {
 	int key_bit_array[DES_KEY_LENGTH_BITS];
@@ -37,6 +47,11 @@ static void drop_parity_bits(uint64_t *key)
 	*key = (output_key << 8);
 }
 
+/**
+ * @brief Permutes the key according to the DES key permutation table.
+ *
+ * @param key Pointer to the key.
+ */
 static void permute_key(uint64_t *key)
 {
 	int key_bit_array[DES_KEY_LENGTH_BITS], output_key_array[DES_KEY_EFFECTIVE_LENGTH_BITS];
