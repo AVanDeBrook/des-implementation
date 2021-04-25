@@ -15,7 +15,7 @@ static const int key_compression_table[DES_KEY_LENGTH_BITS] = {
 static void choose_subkey(uint64_t key, int round);
 static void rotate_key(uint64_t key, int n);
 static void compress_key(uint64_t *key);
-static void expand(unsigned char expanded_block[SUBKEY_LENGTH], unsigned char half_block[HALFBLOCK_LENGTH], unsigned char subkey[SUBKEY_LENGTH]);
+static void expand(uint32_t half_block, uint64_t expanded_block);
 
 int do_feistel_cipher(uint64_t key, uint64_t *data)
 {
@@ -46,10 +46,6 @@ static void compress_key(uint64_t *key)
 {
 }
 
-static void expand(unsigned char expanded_block[SUBKEY_LENGTH], unsigned char half_block[HALFBLOCK_LENGTH], unsigned char subkey[SUBKEY_LENGTH])
+static void expand(uint32_t half_block, uint64_t expanded_block)
 {
-	int i;
-	for (i = 0; i < SUBKEY_LENGTH; i++) {
-		expanded_block[i] = half_block[expansion_table[i] - 1];
-	}
 }

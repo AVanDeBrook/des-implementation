@@ -13,7 +13,9 @@ static uint32_t parse_args(program_info_t *cmd_info, char **argv);
 
 int main(int argc, char **argv)
 {
-	program_info_t cmd_args = { .encrypt_or_decrypt = 0, .file_or_string = 0, .data = 0, .key = 0 };
+	program_info_t cmd_args;
+
+	memset(&cmd_args, 0, sizeof(program_info_t));
 
 	if (argc < REQUIRED_ARGS) {
 		fprintf(stderr, "Usage: %s [encrypt|decrypt] [key] [-f <file> | -s <string>]\n", argv[0]);

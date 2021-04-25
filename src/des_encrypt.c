@@ -15,13 +15,10 @@
 int encrypt(uint64_t key, uint64_t data)
 {
 	// perform initial permutation
-	printf("%016" PRIX64 "\n", data);
 	do_permutation(PERMUTATION_INITIAL, &data);
-	printf("%016" PRIX64 "\n", data);
 	// 16 feistel cipher rounds
 
 	// perform final permutation
 	do_permutation(PERMUTATION_FINAL, &data);
-	printf("%016" PRIX64 "\n", data);
 	return 0;
 }

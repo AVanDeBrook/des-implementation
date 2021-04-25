@@ -35,7 +35,9 @@ static void drop_parity_bits(uint64_t *key)
 	int key_bit_array[DES_KEY_LENGTH_BITS];
 	uint64_t output_key = 0;
 
-	int2binarray(key_bit_array, *key);
+	memset(key_bit_array, 0, sizeof(int));
+
+	int2binarray(key_bit_array, *key, DES_KEY_LENGTH_BITS);
 
 	for (int i = 0; i < DES_KEY_LENGTH_BITS; i++) {
 		if ((i + 1) % 8 != 0) {
@@ -57,19 +59,16 @@ static void permute_key(uint64_t *key)
 	int key_bit_array[DES_KEY_LENGTH_BITS], output_key_array[DES_KEY_EFFECTIVE_LENGTH_BITS];
 	uint64_t permuted_key = 0;
 
-	memset(key_bit_array, 0, sizeof(int));
-	memset(output_key_array, 0, sizeof(int));
+	memset(key_bit_array, 0, DES_KEY_LENGTH_BITS);
+	memset(output_key_array, 0, DES_KEY_EFFECTIVE_LENGTH_BITS);
 
-	int2binarray(key_bit_array, *key);
+	int2binarray(key_bit_array, *key, DES_KEY_EFFECTIVE_LENGTH_BITS);
 
 	for (int i = 0; i < DES_KEY_EFFECTIVE_LENGTH_BITS; i++) {
 		output_key_array[i] = key_bit_array[key_permutation_table[i] - 1];
 	}
 
-	for (int i = 0; i < DES_KEY_EFFECTIVE_LENGTH_BITS; i++) {
-		permuted_key <<= 1;
-		permuted_key |= output_key_array[i];
-	}
+	binarray2int(&permuted_key, output_key_array, DES_KEY_EFFECTIVE_LENGTH_BITS);
 
 	*key = (permuted_key << 8);
 }

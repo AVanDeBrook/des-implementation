@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "permutation.h"
 #include "gendefs.h"
@@ -29,6 +30,9 @@ int do_permutation(permutation_t permutation, uint64_t *data)
 	uint64_t output_data;
 	int input_data_bits[DES_DATA_LENGTH_BITS], output_data_bits[DES_DATA_LENGTH_BITS];
 
+	memset(input_data_bits, 0, DES_DATA_LENGTH_BITS);
+	memset(output_data_bits, 0, DES_DATA_LENGTH_BITS);
+
 	if (permutation == PERMUTATION_INITIAL) {
 		permutation_table = initial_permutation_table;
 	} else if (permutation == PERMUTATION_FINAL) {
@@ -38,13 +42,13 @@ int do_permutation(permutation_t permutation, uint64_t *data)
 	}
 
 	if (status_code == 0) {
-		int2binarray(input_data_bits, *data);
+		int2binarray(input_data_bits, *data, DES_DATA_LENGTH_BITS);
 
 		for (i = 0; i < DES_DATA_LENGTH_BITS; i++) {
 			output_data_bits[i] = input_data_bits[permutation_table[i] - 1];
 		}
 
-		binarray2int(&output_data, output_data_bits);
+		binarray2int(&output_data, output_data_bits, DES_DATA_LENGTH_BITS);
 
 		*data = output_data;
 	}
