@@ -2,24 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdint.h>
 
 #include "main.h"
 #include "des_encrypt.h"
+#include "key_schedule.h"
 #include "utils.h"
 
-/**
- * @brief Parses command-line arguments and sets program info accordingly.
- *
- * @param cmd_info data structure containing program info @see program_info_t, program_info_s
- * @param argv command line arguments
- * @return int bitfield indicating errors with arguments. Value of 0 indicates no errors. Bit 0 = problem with encrypt/decrypt syntax, 1 = problem with key, 2 =
- * problem with data type syntax, 3 = problem with data itself.
- */
-static int parse_args(program_info_t *cmd_info, char **argv);
+static uint32_t parse_args(program_info_t *cmd_info, char **argv);
 
 int main(int argc, char **argv)
 {
-	program_info_t cmd_args;
+	program_info_t cmd_args = { .encrypt_or_decrypt = 0, .file_or_string = 0, .data = 0, .key = 0 };
 
 	if (argc < REQUIRED_ARGS) {
 		fprintf(stderr, "Usage: %s [encrypt|decrypt] [key] [-f <file> | -s <string>]\n", argv[0]);
@@ -38,9 +32,17 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-static int parse_args(program_info_t *cmd_info, char **argv)
+/**
+ * @brief Parses command-line arguments and sets program info accordingly.
+ *
+ * @param cmd_info data structure containing program info @see program_info_t, program_info_s
+ * @param argv command line arguments
+ * @return int bitfield indicating errors with arguments. Value of 0 indicates no errors. Bit 0 = problem with encrypt/decrypt syntax, 1 = problem with key, 2 =
+ * problem with data type syntax, 3 = problem with data itself.
+ */
+static uint32_t parse_args(program_info_t *cmd_info, char **argv)
 {
-	int i, status_code = 0;
+	uint32_t i, status_code = 0;
 	FILE *data_file;
 
 	if (strcmp(argv[1], "encrypt") == 0) {
@@ -52,12 +54,13 @@ static int parse_args(program_info_t *cmd_info, char **argv)
 	}
 
 	for (i = 0; i < DES_KEY_LENGTH_BYTES && argv[2][i] != 0; i++) {
-		cmd_info->key[i] = argv[2][i];
+		cmd_info->key <<= 8;
+		cmd_info->key |= argv[2][i];
 	}
 
-	if (strcmp(argv[3], "-f") == 0) {
-		cmd_info->file_or_string = DATA_TYPE_FILE;
-	} else if (strcmp(argv[3], "-s") == 0) {
+	process_key(&(cmd_info->key));
+
+	if (strcmp(argv[3], "-s") == 0) {
 		cmd_info->file_or_string = DATA_TYPE_STRING;
 	} else {
 		status_code |= SET_BIT(2);
@@ -66,14 +69,15 @@ static int parse_args(program_info_t *cmd_info, char **argv)
 	if (cmd_info->file_or_string == DATA_TYPE_FILE) {
 		if (access(argv[4], F_OK)) {
 			data_file = fopen(argv[4], "rb");
-			fread(cmd_info->data, sizeof(char), DES_DATA_LENGTH_BYTES, data_file);
+			fread(&(cmd_info->data), sizeof(uint64_t), 1, data_file);
 			fclose(data_file);
 		} else {
 			SET_BIT(3);
 		}
 	} else if (cmd_info->file_or_string == DATA_TYPE_STRING) {
-		for (i = 0; i < DES_DATA_LENGTH_BYTES && argv[4] != 0; i++) {
-			cmd_info->data[i] = argv[4][i];
+		for (i = 0; i < DES_DATA_LENGTH_BYTES && argv[4][i] != 0; i++) {
+			cmd_info->data <<= 8;
+			cmd_info->data |= argv[4][i];
 		}
 	} else {
 		SET_BIT(3);

@@ -4,6 +4,7 @@
 /* Includes */
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 /* Function prototypes */
 /**
@@ -13,6 +14,6 @@
  * @param data data input by user to encrypt
  * @return int
  */
-int encrypt(char *key, unsigned char *data);
+int encrypt(uint64_t key, uint64_t data);
 
 #endif

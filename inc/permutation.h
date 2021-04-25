@@ -17,6 +17,6 @@ typedef enum permutation_s {
  * @param data
  * @return int
  */
-int do_permutation(permutation_t permutation, unsigned char *data);
+int do_permutation(permutation_t permutation, uint64_t *data);
 
 #endif

@@ -2,6 +2,7 @@
 #define __MAIN_H
 
 #include "gendefs.h"
+#include <stdint.h>
 
 /* Type, structure, enumerator definitions */
 typedef enum scheme_operation_e {
@@ -17,8 +18,8 @@ typedef enum data_type_e {
 typedef struct program_info_s {
 	scheme_operation_t encrypt_or_decrypt;
 	data_type_t file_or_string;
-	char data[DES_DATA_LENGTH_BYTES];
-	char key[DES_KEY_LENGTH_BYTES];
+	uint64_t data;
+	uint64_t key;
 } program_info_t;
 
 #endif
