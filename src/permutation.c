@@ -30,8 +30,8 @@ int do_permutation(permutation_t permutation, uint64_t *data)
 	uint64_t output_data;
 	int input_data_bits[DES_DATA_LENGTH_BITS], output_data_bits[DES_DATA_LENGTH_BITS];
 
-	memset(input_data_bits, 0, DES_DATA_LENGTH_BITS);
-	memset(output_data_bits, 0, DES_DATA_LENGTH_BITS);
+	memset(input_data_bits, 0, sizeof(int) * DES_DATA_LENGTH_BITS);
+	memset(output_data_bits, 0, sizeof(int) * DES_DATA_LENGTH_BITS);
 
 	if (permutation == PERMUTATION_INITIAL) {
 		permutation_table = initial_permutation_table;
