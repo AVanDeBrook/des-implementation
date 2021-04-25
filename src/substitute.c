@@ -47,6 +47,12 @@ static void divide_input(uint8_t *byte_array, uint64_t mixed_key);
 static void substitute(uint8_t *byte_array);
 static uint32_t recombine_output(uint8_t *byte_array);
 
+/**
+ * @brief Performs the feistel cipher substitution process.
+ *
+ * @param mixed_key Key XOR'd with the expanded data block half (@see key mixing step of feistel cipher).
+ * @return uint32_t Substituted data according to the S-Boxes defined above.
+ */
 uint32_t do_substitution(uint64_t mixed_key)
 {
 	uint8_t s_box_input[S_BOX_INPUTS];
@@ -61,6 +67,12 @@ uint32_t do_substitution(uint64_t mixed_key)
 	return output;
 }
 
+/**
+ * @brief Divides the input data into 6-bit portions (stored in bytes) so they can be easily processed through the S-Boxes.
+ *
+ * @param byte_array Array of bytes to store each of the 6-bit "blocks" to.
+ * @param mixed_key Mixed key and data to process "blocks" from.
+ */
 static void divide_input(uint8_t *byte_array, uint64_t mixed_key)
 {
 	for (int i = 0; i < S_BOX_INPUTS; i++) {
@@ -69,6 +81,11 @@ static void divide_input(uint8_t *byte_array, uint64_t mixed_key)
 	}
 }
 
+/**
+ * @brief Processes the 6-bit data through the S-Boxes and substitutes it with the corresponding 4-bit data.
+ *
+ * @param byte_array Array that contains all of the 6-bit data. Should be at least 8 bytes in length.
+ */
 static void substitute(uint8_t *byte_array)
 {
 	uint8_t row = 0, column = 0;
@@ -80,6 +97,12 @@ static void substitute(uint8_t *byte_array)
 	}
 }
 
+/**
+ * @brief Recombines 4-bit output (stored in byte_array) into a 32-bit integer.
+ *
+ * @param byte_array Array of bytes containing the 4-bit data (processed first by the substitute function). @see substitue function.
+ * @return uint32_t 32-bit output data (half block).
+ */
 static uint32_t recombine_output(uint8_t *byte_array)
 {
 	uint32_t output = 0;

@@ -22,6 +22,12 @@ static uint64_t expand_block(uint32_t half_block);
 static uint64_t mix_key(uint64_t expanded_block, uint64_t round_key);
 static uint32_t permute_output(uint32_t output_data);
 
+/**
+ * @brief Performs the feistel cipher functions on each half block (32-bits) or data.
+ *
+ * @param key User defined key
+ * @param data User supplied data
+ */
 void do_feistel_cipher(uint64_t key, uint64_t *data)
 {
 	uint32_t half_blocks[2];
@@ -34,6 +40,13 @@ void do_feistel_cipher(uint64_t key, uint64_t *data)
 	*data = recombine_blocks(half_blocks);
 }
 
+/**
+ * @brief Actual feistel cipher. Runs on one half block of data (32-bits).
+ *
+ * @param key User defined key
+ * @param half_block Half block (32-bits) of data from the user supplied data (64-bits).
+ * @return uint32_t Final encrypted half block of data (result from 16 rounds of feistel ciphers).
+ */
 static uint32_t feistel_cipher(uint64_t key, uint32_t half_block)
 {
 	int i;
@@ -55,12 +68,24 @@ static uint32_t feistel_cipher(uint64_t key, uint32_t half_block)
 	return half_block;
 }
 
+/**
+ * @brief Divides the user data block (64-bits) into two 32-bit half blocks, as defined by the DES algorithm.
+ *
+ * @param half_blocks Array to store the half blocks in (32-bit array with a length of at least 2).
+ * @param data_block Data block to split into half blocks (64-bits).
+ */
 static void divide_block(uint32_t *half_blocks, uint64_t data_block)
 {
 	half_blocks[0] = data_block & LOWER_HALF_BLOCK_MASK;
 	half_blocks[1] = data_block & UPPER_HALF_BLOCK_MASK;
 }
 
+/**
+ * @brief Recombines the two 32-bit half blocks into one 64-bit block of data.
+ *
+ * @param half_blocks Array of half blocks to read data from (32-bit array with length of at least 2).
+ * @return uint64_t Contiguous block of data.
+ */
 static uint64_t recombine_blocks(uint32_t *half_blocks)
 {
 	uint64_t recombined_data = 0;
@@ -72,6 +97,12 @@ static uint64_t recombine_blocks(uint32_t *half_blocks)
 	return recombined_data;
 }
 
+/**
+ * @brief Expands a 32-bit half block of data into a 48-bit (expanded) block to be mixed with the round key.
+ *
+ * @param half_block 32-bit half block of data.
+ * @return uint64_t 48-bit expanded block (stored in 64-bits for convenience).
+ */
 static uint64_t expand_block(uint32_t half_block)
 {
 	int half_block_bits[DES_DATA_LENGTH_BITS / 2], expanded_block_bits[EXPANDED_BLOCK_LENGTH];
@@ -91,11 +122,24 @@ static uint64_t expand_block(uint32_t half_block)
 	return expanded_block;
 }
 
+/**
+ * @brief Mixes the round key with the expanded half block of data (48-bits each). Simple bitwise XOR function.
+ *
+ * @param expanded_block 48-bit expanded block of data. @see expand_block
+ * @param round_key 48-bit round key. @see key_schedule.c
+ * @return uint64_t 48-bit result. Stored in 64-bits for ease of use.
+ */
 static uint64_t mix_key(uint64_t expanded_block, uint64_t round_key)
 {
 	return expanded_block ^ round_key;
 }
 
+/**
+ * @brief Permutes the data (last step of feistel cipher) according to the P-Box permutation table. @see p_box_permutation_table
+ *
+ * @param output_data Output of the substituition function (32-bits).
+ * @return uint32_t Final permutation of the feistel cipher (not to be confused with the final permutation table @see permutation.c).
+ */
 static uint32_t permute_output(uint32_t output_data)
 {
 	int data_bits[DES_DATA_LENGTH_BITS / 2], permuted_bits[DES_DATA_LENGTH_BITS / 2];
