@@ -14,4 +14,10 @@
 #define DATA_BYTE_POS(n) (n / DES_KEY_LENGTH_BYTES)
 #define DATA_BIT_POS_IN_BYTE(n) (n % DES_KEY_LENGTH_BYTES)
 
+/* Type, enumerator, and structure definitions */
+typedef enum scheme_operation_e {
+	SCHEME_ENCRYPT,
+	SCHEME_DECRYPT,
+} scheme_operation_t;
+
 #endif

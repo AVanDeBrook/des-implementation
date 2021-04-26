@@ -1,5 +1,4 @@
 #include <string.h>
-#include <inttypes.h>
 
 #include "key_schedule.h"
 #include "gendefs.h"

@@ -3,10 +3,11 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 #include "main.h"
-#include "gendefs.h"
 #include "des_encrypt.h"
+#include "des_decrypt.h"
 #include "key_schedule.h"
 #include "utils.h"
 
@@ -18,19 +19,35 @@ int main(int argc, char **argv)
 
 	memset(&cmd_args, 0, sizeof(program_info_t));
 
-	if (argc < REQUIRED_ARGS) {
-		fprintf(stderr, "Usage: %s [encrypt|decrypt] [key] [-f <file> | -s <string>]\n", argv[0]);
-		return 1;
-	}
+	// if (argc < REQUIRED_ARGS) {
+	// 	fprintf(stderr, "Usage: %s [encrypt|decrypt] [key] [-f <file> | -s <string>]\n", argv[0]);
+	// 	return 1;
+	// }
 
-	if (parse_args(&cmd_args, argv) == 0) {
-		if (cmd_args.encrypt_or_decrypt == SCHEME_ENCRYPT) {
-			encrypt(cmd_args.key, cmd_args.data);
-		}
-	} else {
-		fprintf(stderr, "Problem with input syntax.\n");
-		return 1;
-	}
+	// if (parse_args(&cmd_args, argv) == 0) {
+	// 	if (cmd_args.encrypt_or_decrypt == SCHEME_ENCRYPT) {
+	// 		encrypt(cmd_args.key, cmd_args.data);
+	// 	} else {
+	// 		decrypt(cmd_args.key, cmd_args.data);
+	// 	}
+	// } else {
+	// 	fprintf(stderr, "Problem with input syntax.\n");
+	// 	return 1;
+	// }
+
+	const uint64_t key = 0x3030303030303030;
+	const uint64_t plaintext = 0x3030303030303030;
+
+	printf("Key: %016" PRIx64 "\n", key);
+	printf("Plaintext: %016" PRIx64 "\n\n", plaintext);
+
+	uint64_t encrypted_data = encrypt(key, plaintext);
+
+	printf("Encrypted data: %016" PRIx64 "\n\n", encrypted_data);
+
+	uint64_t decrypted_data = decrypt(key, encrypted_data);
+
+	printf("Decrypted data: %016" PRIx64 "\n", decrypted_data);
 
 	return 0;
 }

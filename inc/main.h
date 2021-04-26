@@ -1,14 +1,12 @@
 #ifndef __MAIN_H
 #define __MAIN_H
 
+/* Includes */
 #include <stdint.h>
 
-/* Type, structure, enumerator definitions */
-typedef enum scheme_operation_e {
-	SCHEME_ENCRYPT,
-	SCHEME_DECRYPT,
-} scheme_operation_t;
+#include "gendefs.h"
 
+/* Type, structure, enumerator definitions */
 typedef enum data_type_e {
 	DATA_TYPE_FILE,
 	DATA_TYPE_STRING,

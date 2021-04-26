@@ -5,6 +5,6 @@
 #include <stdint.h>
 
 /* Function prototypes */
-void encrypt(uint64_t key, uint64_t data);
+uint64_t encrypt(uint64_t key, uint64_t data);
 
 #endif

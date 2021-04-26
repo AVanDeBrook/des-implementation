@@ -1,5 +1,4 @@
 #include <string.h>
-#include <inttypes.h>
 
 #include "substitute.h"
 
@@ -62,6 +61,7 @@ uint32_t do_substitution(uint64_t mixed_key)
 
 	divide_input(s_box_input, mixed_key);
 	substitute(s_box_input);
+
 	output = recombine_output(s_box_input);
 
 	return output;
@@ -111,4 +111,6 @@ static uint32_t recombine_output(uint8_t *byte_array)
 		output <<= 4;
 		output |= byte_array[i] & 0x0f;
 	}
+
+	return output;
 }

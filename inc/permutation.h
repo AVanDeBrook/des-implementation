@@ -1,6 +1,9 @@
 #ifndef __PERMUTATION_H
 #define __PERMUTATION_H
 
+/* Includes */
+#include <stdint.h>
+
 /* Type, structure, enumerator definitions */
 typedef enum permutation_s {
 	PERMUTATION_INITIAL,

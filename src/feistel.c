@@ -1,10 +1,8 @@
 #include <string.h>
-#include <inttypes.h>
 
 #include "feistel.h"
 #include "key_schedule.h"
 #include "substitute.h"
-#include "gendefs.h"
 #include "utils.h"
 
 static const int expansion_table[SUBKEY_LENGTH] = {
@@ -15,7 +13,7 @@ static const int expansion_table[SUBKEY_LENGTH] = {
 static const int p_box_permutation_table[DES_DATA_LENGTH_BITS / 2] = { 16, 7, 20, 21, 29, 12, 28, 17, 1,  15, 23, 26, 5,  18, 31, 10,
 								       2,  8, 24, 14, 32, 27, 3,  9,  19, 13, 30, 6,  22, 11, 4,  25 };
 
-static uint32_t feistel_cipher(uint64_t key, uint32_t half_block);
+static uint32_t feistel_function(uint64_t key, uint32_t half_block);
 static void divide_block(uint32_t *half_blocks, uint64_t data_block);
 static uint64_t recombine_blocks(uint32_t *half_blocks);
 static uint64_t expand_block(uint32_t half_block);
@@ -25,17 +23,34 @@ static uint32_t permute_output(uint32_t output_data);
 /**
  * @brief Performs the feistel cipher functions on each half block (32-bits) or data.
  *
- * @param key User defined key
- * @param data User supplied data
+ * @param mode Encryption or decryption mode.
+ * @param key User defined key.
+ * @param data User supplied data.
  */
-void do_feistel_cipher(uint64_t key, uint64_t *data)
+void do_feistel_cipher(scheme_operation_t mode, uint64_t key, uint64_t *data)
 {
-	uint32_t half_blocks[2];
+	uint32_t half_blocks[2], feistel_output, xor_output;
+	uint64_t subkeys[FEISTEL_ROUNDS];
+
+	memset(half_blocks, 0, sizeof(uint32_t) * 2);
+	memset(subkeys, 0, sizeof(uint64_t) * FEISTEL_ROUNDS);
 
 	divide_block(half_blocks, *data);
 
-	half_blocks[0] = feistel_cipher(key, half_blocks[0]);
-	half_blocks[1] = feistel_cipher(key, half_blocks[1]);
+	choose_round_key(subkeys, key);
+
+	for (int i = 0; i < FEISTEL_ROUNDS; i++) {
+		if (mode == SCHEME_ENCRYPT) {
+			feistel_output = feistel_function(subkeys[i], half_blocks[0]);
+		} else {
+			feistel_output = feistel_function(subkeys[(FEISTEL_ROUNDS - 1) - i], half_blocks[0]);
+		}
+
+		xor_output = half_blocks[1] ^ feistel_output;
+
+		half_blocks[1] = half_blocks[0];
+		half_blocks[0] = xor_output;
+	}
 
 	*data = recombine_blocks(half_blocks);
 }
@@ -47,25 +62,17 @@ void do_feistel_cipher(uint64_t key, uint64_t *data)
  * @param half_block Half block (32-bits) of data from the user supplied data (64-bits).
  * @return uint32_t Final encrypted half block of data (result from 16 rounds of feistel ciphers).
  */
-static uint32_t feistel_cipher(uint64_t key, uint32_t half_block)
+static uint32_t feistel_function(uint64_t round_key, uint32_t half_block)
 {
-	int i;
-	uint64_t round_key = 0, expanded_half_block = 0, mixed_key = 0;
-	uint64_t subkeys[FEISTEL_ROUNDS];
-	uint32_t output_data = 0;
+	uint64_t expanded_half_block = 0, mixed_key = 0;
+	uint32_t substituted_data = 0;
 
-	memset(subkeys, 0, sizeof(uint64_t) * FEISTEL_ROUNDS);
+	expanded_half_block = expand_block(half_block);
 
-	choose_round_key(subkeys, key);
+	mixed_key = mix_key(expanded_half_block, round_key);
+	substituted_data = do_substitution(mixed_key);
 
-	for (i = 0; i < FEISTEL_ROUNDS; i++) {
-		expanded_half_block = expand_block(half_block);
-		mixed_key = mix_key(expanded_half_block, subkeys[i]);
-		output_data = do_substitution(mixed_key);
-		half_block = permute_output(output_data);
-	}
-
-	return half_block;
+	return permute_output(substituted_data);
 }
 
 /**
@@ -77,7 +84,7 @@ static uint32_t feistel_cipher(uint64_t key, uint32_t half_block)
 static void divide_block(uint32_t *half_blocks, uint64_t data_block)
 {
 	half_blocks[0] = data_block & LOWER_HALF_BLOCK_MASK;
-	half_blocks[1] = data_block & UPPER_HALF_BLOCK_MASK;
+	half_blocks[1] = (data_block & UPPER_HALF_BLOCK_MASK) >> 32;
 }
 
 /**
@@ -108,8 +115,8 @@ static uint64_t expand_block(uint32_t half_block)
 	int half_block_bits[DES_DATA_LENGTH_BITS / 2], expanded_block_bits[EXPANDED_BLOCK_LENGTH];
 	uint64_t expanded_block = 0;
 
-	memset(half_block_bits, 0, DES_DATA_LENGTH_BITS / 2);
-	memset(expanded_block_bits, 0, EXPANDED_BLOCK_LENGTH);
+	memset(half_block_bits, 0, sizeof(int) * DES_DATA_LENGTH_BITS / 2);
+	memset(expanded_block_bits, 0, sizeof(int) * EXPANDED_BLOCK_LENGTH);
 
 	int2binarray(half_block_bits, half_block, DES_DATA_LENGTH_BITS / 2);
 
