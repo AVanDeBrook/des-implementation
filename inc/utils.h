@@ -1,6 +1,11 @@
 #ifndef __UTILS_H
 #define __UTILS_H
 
+#if CMAKE_BUILD_TYPE == Debug
+#include <stdio.h>
+#include <inttypes.h>
+#endif
+
 /* Includes */
 #include <stdint.h>
 

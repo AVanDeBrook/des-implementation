@@ -65,14 +65,15 @@ void do_feistel_cipher(scheme_operation_t mode, uint64_t key, uint64_t *data)
 static uint32_t feistel_function(uint64_t round_key, uint32_t half_block)
 {
 	uint64_t expanded_half_block = 0, mixed_key = 0;
-	uint32_t substituted_data = 0;
+	uint32_t substituted_data = 0, permuted_data = 0;
 
 	expanded_half_block = expand_block(half_block);
 
 	mixed_key = mix_key(expanded_half_block, round_key);
 	substituted_data = do_substitution(mixed_key);
+	permuted_data = permute_output(substituted_data);
 
-	return permute_output(substituted_data);
+	return permuted_data;
 }
 
 /**
@@ -115,14 +116,13 @@ static uint64_t expand_block(uint32_t half_block)
 	int half_block_bits[DES_DATA_LENGTH_BITS / 2], expanded_block_bits[EXPANDED_BLOCK_LENGTH];
 	uint64_t expanded_block = 0;
 
-	memset(half_block_bits, 0, sizeof(int) * DES_DATA_LENGTH_BITS / 2);
+	memset(half_block_bits, 0, sizeof(int) * (DES_DATA_LENGTH_BITS / 2));
 	memset(expanded_block_bits, 0, sizeof(int) * EXPANDED_BLOCK_LENGTH);
 
-	int2binarray(half_block_bits, half_block, DES_DATA_LENGTH_BITS / 2);
+	int2binarray(half_block_bits, half_block, (DES_DATA_LENGTH_BITS / 2));
 
-	for (int i = 0; i < DES_DATA_LENGTH_BITS / 2; i++) {
+	for (int i = 0; i < DES_DATA_LENGTH_BITS / 2; i++)
 		expanded_block_bits[i] = half_block_bits[expansion_table[i] - 1];
-	}
 
 	binarray2int(&expanded_block, expanded_block_bits, EXPANDED_BLOCK_LENGTH);
 
